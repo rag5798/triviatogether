@@ -1,0 +1,42 @@
+<body>
+  <h1>Select a Quiz Category</h1>
+  <form id="categoryForm">
+    <fieldset>
+      <legend>Entertainment</legend>
+      <% categories
+        .filter(c => c.startsWith('Entertainment'))
+        .forEach((category, index) => { %>
+          <label>
+            <input type="radio" name="category" value="<%= index + 9 %>">
+            <%= category %>
+          </label><br>
+      <% }) %>
+    </fieldset>
+
+    <fieldset>
+      <legend>Science</legend>
+      <% categories
+        .filter(c => c.startsWith('Science'))
+        .forEach((category, index) => { %>
+          <label>
+            <input type="radio" name="category" value="<%= index + 9 %>">
+            <%= category %>
+          </label><br>
+      <% }) %>
+    </fieldset>
+
+    <fieldset>
+      <legend>Other</legend>
+      <% categories
+        .filter(c => !c.startsWith('Entertainment') && !c.startsWith('Science'))
+        .forEach((category, index) => { %>
+          <label>
+            <input type="radio" name="category" value="<%= index + 9 %>">
+            <%= category %>
+          </label><br>
+      <% }) %>
+    </fieldset>
+
+    <button type="submit" id="start-btn">Start Quiz</button>
+  </form>
+</body>

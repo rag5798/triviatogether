@@ -1,0 +1,23 @@
+.category-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 400px;
+}
+
+.category {
+  padding: 10px;
+  border: 1px solid #aaa;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.category:hover {
+  background-color: #e0f0ff;
+}
+
+.category.selected {
+  background-color: #007bff;
+  color: white;
+  font-weight: bold;
+}
