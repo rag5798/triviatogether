@@ -1,0 +1,224 @@
+/* === General Reset and Base === */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #f4f4f9;
+  padding: 1rem;
+  max-width: 600px;
+  margin: 0 auto;
+  color: #333;
+}
+
+/* === Typography === */
+h1, h2 {
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+p {
+  margin: 0.5rem 0;
+}
+
+/* === Card Container === */
+.card {
+  background: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1.5rem;
+}
+
+/* === Buttons === */
+.btn {
+  display: inline-block;
+  width: 100%;
+  padding: 0.75rem;
+  margin-top: 0.75rem;
+  font-size: 1rem;
+  font-weight: bold;
+  text-align: center;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s ease-in-out;
+}
+
+.btn:hover {
+  background-color: #0056b3;
+}
+
+.btn.danger {
+  background-color: #dc3545;
+}
+
+.btn.danger:hover {
+  background-color: #a71d2a;
+}
+
+.btn.primary {
+  background-color: #28a745;
+}
+
+.btn.primary:hover {
+  background-color: #1e7e34;
+}
+
+/* === Inputs and Select === */
+input,
+select {
+  width: 100%;
+  padding: 0.7rem;
+  font-size: 1rem;
+  margin: 0.5rem 0;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+/* === Lists === */
+ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+ul li {
+  padding: 0.5rem 0;
+}
+
+/* === Countdown and Feedback === */
+.countdown-timer {
+  font-size: 1.2rem;
+  font-weight: bold;
+  text-align: center;
+  margin: 1rem 0;
+}
+
+.feedback {
+  text-align: center;
+  font-size: 1.1rem;
+  font-weight: bold;
+  margin: 1rem 0;
+}
+
+.scoreboard ul {
+  padding-left: 1rem;
+}
+
+.status-message {
+  display: none;
+  text-align: center;
+  padding: 12px;
+  font-size: 1rem;
+  background-color: #e0f7fa;
+  color: #006064;
+  border-bottom: 2px solid #00838f;
+  font-weight: bold;
+  z-index: 1000;
+  margin-bottom: 1rem;
+}
+
+/* === Question Review === */
+.question-summary {
+  border-top: 1px solid #ccc;
+  padding: 0.75rem 0;
+}
+
+.thanks-msg {
+  text-align: center;
+  margin-top: 1rem;
+}
+
+/* === Quiz Choices === */
+.choices-list button {
+  display: block;
+  width: 100%;
+  margin-bottom: 0.5rem;
+  padding: 0.75rem;
+  font-size: 1rem;
+  border-radius: 6px;
+  background-color: #eeeeee;
+  border: 1px solid #ccc;
+  cursor: pointer;
+}
+
+.choices-list button:hover {
+  background-color: #ddd;
+}
+
+/* === Custom Select Styling === */
+select {
+  appearance: none; /* Removes default arrow on most browsers */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  padding: 0.7rem 1rem;
+  font-size: 1rem;
+  border-radius: 6px;
+  background-image: url("data:image/svg+xml;utf8,<svg fill='gray' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 1rem;
+  cursor: pointer;
+  transition: border-color 0.3s ease-in-out;
+}
+
+select:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
+}
+
+optgroup {
+  font-weight: bold;
+  color: #333;
+  font-size: 0.95rem;
+}
+
+.history-entry {
+  border: 1px solid #ddd;
+  padding: 15px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  background: #fafafa;
+}
+
+.question-review {
+  margin-top: 10px;
+  padding-left: 10px;
+  border-left: 3px solid #ccc;
+}
+
+.btn.small {
+  padding: 5px 10px;
+  font-size: 0.85rem;
+  margin-top: 8px;
+}
+
+@media (min-width: 768px) {
+  body {
+    max-width: 700px;
+    padding: 2rem;
+  }
+
+  .btn {
+    width: auto;
+    display: inline-block;
+  }
+
+  .choices-list button {
+    width: 48%;
+    display: inline-block;
+    margin: 0.5%;
+  }
+
+  #disconnectContainer {
+    text-align: center;
+  }
+}

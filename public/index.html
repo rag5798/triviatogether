@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Quiz Socket Game</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/client.js" defer></script>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <button class="btn danger" onclick="handleBackToModeSelect()">Back to Home</button>
+    <h1>Quiz Game</h1>
+
+    <!-- Status Message -->
+    <div id="statusMessage" class="status-message"></div>
+
+    <!-- PAGE: Mode Select -->
+    <section id="modeSelectPage" class="section card">
+      <h2>Welcome to Quiz Game</h2>
+      <p>Select a mode to begin:</p>
+      <button class="btn primary" onclick="goToSinglePlayer()">
+        Single Player
+      </button>
+      <button class="btn" onclick="goToMultiplayer()">Multiplayer</button>
+      <button class="btn" onclick="showSoloHistory()">View History</button>
+    </section>
+
+    <!-- PAGE: Single Player Category -->
+    <section
+      id="singlePlayerCategoryPage"
+      class="section card"
+      style="display: none"
+    >
+      <h2>Select a Category</h2>
+      <select id="singlePlayerCategorySelect" class="dropdown"></select>
+      <button class="btn primary" onclick="startSinglePlayerGame()">
+        Start Quiz
+      </button>
+      <button class="btn danger" onclick="showPage('modeSelectPage')">
+        Back
+      </button>
+    </section>
+
+    <!-- PAGE: Solo History -->
+    <section id="soloHistoryPage" class="section card" style="display: none">
+      <h2>Solo Quiz History</h2>
+      <div id="soloHistoryList"></div>
+      <button class="btn danger" onclick="showPage('modeSelectPage')">
+        Back
+      </button>
+    </section>
+
+    <!-- PAGE: Home (Multiplayer Join/Create) -->
+    <section id="homePage" class="section card" style="display: none">
+      <h2>Host a Room</h2>
+      <input id="hostName" type="text" placeholder="Your Name" />
+      <button class="btn" onclick="hostRoom()">Start Hosting</button>
+
+      <h2>Join a Room</h2>
+      <input id="joinCode" type="text" placeholder="Room Code (e.g., ABCD)" />
+      <input id="joinName" type="text" placeholder="Your Name" />
+      <button class="btn" onclick="joinRoom()">Join Room</button>
+    </section>
+
+    <!-- PAGE: Lobby -->
+    <section id="lobbyPage" class="section card" style="display: none">
+      <h2>Lobby</h2>
+      <p id="roomCodeDisplay" class="room-code"></p>
+      <ul id="playerList" class="player-list"></ul>
+
+      <label for="categorySelect"><strong>Select Category:</strong></label>
+      <select id="categorySelect" class="dropdown"></select>
+
+      <button
+        id="startButton"
+        class="btn primary"
+        style="display: none"
+        onclick="startGame()"
+      >
+        Start Quiz
+      </button>
+
+      <div id="disconnectContainer" style="display: none">
+        <button id="disconnectButton" class="btn danger">Disconnect</button>
+      </div>
+    </section>
+
+    <!-- PAGE: Quiz -->
+    <section id="quizPage" class="section card" style="display: none">
+      <h2>Question</h2>
+      <p id="questionText" class="question-text"></p>
+      <p id="countdown" class="countdown-timer"></p>
+      <ul id="choicesList" class="choices-list"></ul>
+      <div id="feedback" class="feedback"></div>
+      <div id="scoreboard" class="scoreboard"></div>
+    </section>
+
+    <!-- PAGE: Summary -->
+    <section id="summaryPage" class="section card" style="display: none">
+      <h2>Final Scores</h2>
+      <div id="finalScores"></div>
+      <div id="finalScore" class="final-score"></div>
+      <div id="questionReviewList" class="review-list"></div>
+      <p class="thanks-msg">Thanks for playing!</p>
+      <button
+        id="restartButton"
+        class="btn primary"
+        onclick="restartGame()"
+        style="display: none"
+      >
+        Restart Game
+      </button>
+      <button class="btn" onclick="showSoloHistory()">View History</button>
+    </section>
+  </body>
+</html>
