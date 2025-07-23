@@ -20,7 +20,7 @@ function showPage(pageId) {
     "lobbyPage",
     "quizPage",
     "summaryPage",
-    "soloHistoryPage", // ✅ Add this!
+    "soloHistoryPage",
   ];
 
   pages.forEach((id) => {
@@ -36,15 +36,15 @@ function showPage(pageId) {
 }
 
 function goToSinglePlayer() {
-  // You’ll build this page/logic next
   showPage("singlePlayerCategoryPage");
 }
 
 function goToMultiplayer() {
-  showPage("homePage"); // Reuses existing multiplayer home screen
+  showPage("homePage");
 }
 
 function handleBackToModeSelect() {
+  console.log("🔙 Leaving room with:", { roomCode, playerId });
   if (playerId && roomCode) {
     socket.emit("leaveRoom", { roomCode, playerId });
     localStorage.removeItem("playerId");
@@ -180,7 +180,6 @@ function renderSoloQuestion() {
     const list = document.getElementById("questionReviewList");
     list.innerHTML = "";
     currentSoloQuestions.forEach((q, i) => {
-      // same review code as above...
     });
 
     document.getElementById("restartButton").style.display = "none";
@@ -225,12 +224,12 @@ function submitSoloAnswer(selected, correct) {
     : `❌ Incorrect. Correct answer: ${correct}`;
   document.getElementById("feedback").style.color = isCorrect ? "green" : "red";
 
-  // Disable all buttons
+  
   document.querySelectorAll("#choicesList button").forEach((btn) => {
     btn.disabled = true;
   });
 
-  // Next question after 2 seconds
+  
   setTimeout(() => {
     currentSoloIndex++;
     renderSoloQuestion();

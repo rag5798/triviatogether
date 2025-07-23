@@ -1,28 +1,34 @@
-const express = require("express");
-const http = require("http");
-const { Server } = require("socket.io");
-const path = require("path");
-const { randomUUID } = require("crypto");
+const express = require('express');
+const http = require('http');
+const { Server } = require('socket.io');
+const path = require('path');
+const { randomUUID } = require('crypto');
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 const PORT = process.env.PORT || 3000;
 
-// Serve static files
-app.use(express.static(path.join(__dirname, "public")));
+const DEBUG = true;
+function log(...args) {
+  if (DEBUG) console.log(...args);
+}
 
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
+// Serve static files
+app.use(express.static(path.join(__dirname, 'public')));
+
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // Game state
 const gameState = {};
 
-io.on("connection", (socket) => {
-  ////console.log("Socket connected:", socket.id);
+io.on('connection', (socket) => {
+  log('🔌 Socket connected:', socket.id);
 
-  socket.on("hostRoom", ({ hostName, category }, callback) => {
+  socket.on('hostRoom', ({ hostName, category }, callback) => {
+    log(`🏠 Host "${hostName}" created room with category ${category}`);
     const roomCode = generateRoomCode();
     const playerId = randomUUID();
 
@@ -43,9 +49,10 @@ io.on("connection", (socket) => {
     callback({ roomCode, playerId, hostId: playerId });
   });
 
-  socket.on("joinRoom", ({ roomCode, playerName }, callback) => {
+  socket.on('joinRoom', ({ roomCode, playerName }, callback) => {
+    log(`👤 Player "${playerName}" joining room ${roomCode}`);
     const room = gameState[roomCode];
-    if (!room) return callback({ error: "Room not found" });
+    if (!room) return callback({ error: 'Room not found' });
 
     const playerId = randomUUID();
     room.players[playerId] = {
@@ -56,19 +63,19 @@ io.on("connection", (socket) => {
     };
     socket.join(roomCode);
     callback({ playerId, hostId: room.hostId });
-    io.to(roomCode).emit("playerList", Object.values(room.players));
-    logGameState();
+    io.to(roomCode).emit('playerList', Object.values(room.players));
   });
 
-  socket.on("reconnectPlayer", ({ roomCode, playerId }, callback) => {
+  socket.on('reconnectPlayer', ({ roomCode, playerId }, callback) => {
+    log(`🔄 Reconnect attempt: room ${roomCode}, player ${playerId}`);
     const room = gameState[roomCode];
     if (!room || !room.players[playerId]) {
-      return callback({ success: false, error: "Room or player not found" });
+      return callback({ success: false, error: 'Room or player not found' });
     }
 
     room.players[playerId].socketId = socket.id;
     socket.join(roomCode);
-    io.to(roomCode).emit("playerList", Object.values(room.players));
+    io.to(roomCode).emit('playerList', Object.values(room.players));
     callback({
       success: true,
       name: room.players[playerId].name,
@@ -76,12 +83,15 @@ io.on("connection", (socket) => {
     });
   });
 
-  socket.on("startGame", async ({ roomCode, playerId, category }, callback) => {
+  socket.on('startGame', async ({ roomCode, playerId, category }, callback) => {
+    log(
+      `🚀 Game started in room ${roomCode} by ${playerId}, category: ${category}`
+    );
     const room = gameState[roomCode];
     if (!room || room.hostId !== playerId) {
       return callback({
         success: false,
-        error: "Unauthorized or room not found",
+        error: 'Unauthorized or room not found',
       });
     }
 
@@ -92,24 +102,24 @@ io.on("connection", (socket) => {
     }
 
     try {
-      const categoryParam = room.category ? `&category=${room.category}` : "";
+      const categoryParam = room.category ? `&category=${room.category}` : '';
       const res = await fetch(
         `https://opentdb.com/api.php?amount=5&type=multiple${categoryParam}`
       );
       const data = await res.json();
       room.questions = data.results;
 
-      io.to(roomCode).emit("question", formatQuestion(room.questions[0]));
+      io.to(roomCode).emit('question', formatQuestion(room.questions[0]));
       startQuestionTimer(roomCode);
       callback({ success: true });
-      logGameState();
     } catch (err) {
-      console.error("Fetch error:", err);
-      callback({ success: false, error: "Could not load quiz questions" });
+      console.error('Fetch error:', err);
+      callback({ success: false, error: 'Could not load quiz questions' });
     }
   });
 
-  socket.on("submitAnswer", ({ roomCode, playerId, answer }) => {
+  socket.on('submitAnswer', ({ roomCode, playerId, answer }) => {
+    log(`✅ Answer received from ${playerId} in ${roomCode}: ${answer}`);
     const room = gameState[roomCode];
     if (!room || !room.players[playerId]) return;
 
@@ -132,44 +142,41 @@ io.on("connection", (socket) => {
       clearTimeout(room.timer);
       revealAndAdvance(roomCode);
     }
-
-    logGameState();
   });
 
-  socket.on("restartGame", async ({ roomCode, playerId }, callback) => {
+  socket.on('restartGame', async ({ roomCode, playerId }, callback) => {
     const room = gameState[roomCode];
     if (!room || room.hostId !== playerId) {
       return callback({
         success: false,
-        error: "Unauthorized or room not found",
+        error: 'Unauthorized or room not found',
       });
     }
 
     resetGame(room);
     try {
-      const categoryParam = room.category ? `&category=${room.category}` : "";
+      const categoryParam = room.category ? `&category=${room.category}` : '';
       const res = await fetch(
         `https://opentdb.com/api.php?amount=5&type=multiple${categoryParam}`
       );
       const data = await res.json();
       room.questions = data.results;
 
-      io.to(roomCode).emit("question", formatQuestion(room.questions[0]));
+      io.to(roomCode).emit('question', formatQuestion(room.questions[0]));
       startQuestionTimer(roomCode);
       callback({ success: true });
-      logGameState();
     } catch (err) {
-      console.error("Restart error:", err);
-      callback({ success: false, error: "Failed to fetch questions" });
+      console.error('Restart error:', err);
+      callback({ success: false, error: 'Failed to fetch questions' });
     }
   });
 
-  socket.on("returnToLobby", ({ roomCode, playerId }, callback) => {
+  socket.on('returnToLobby', ({ roomCode, playerId }, callback) => {
     const room = gameState[roomCode];
     if (!room || room.hostId !== playerId) {
       return callback({
         success: false,
-        error: "Unauthorized or room not found",
+        error: 'Unauthorized or room not found',
       });
     }
 
@@ -177,29 +184,59 @@ io.on("connection", (socket) => {
     delete room.currentIndex;
     delete room.answerLog;
     room.started = false;
-    io.to(roomCode).emit("returnToLobby");
+    io.to(roomCode).emit('returnToLobby');
     callback({ success: true });
   });
 
-  socket.on("leaveRoom", ({ roomCode, playerId }) => {
-    const room = gameState[roomCode];
-    if (room?.players[playerId]) {
-      delete room.players[playerId];
-      io.to(roomCode).emit("playerList", Object.values(room.players));
+  socket.on('leaveRoom', ({ roomCode, playerId }) => {
+    log('🔍 Server leaveRoom:', { roomCode, playerId });
 
-      if (Object.keys(room.players).length === 0) {
-        delete gameState[roomCode];
-        //console.log(`Room ${roomCode} deleted`);
+    const room = gameState[roomCode];
+    if (!room) {
+      // Try to find a room by socket ID
+      for (const [code, r] of Object.entries(gameState)) {
+        for (const [pid, player] of Object.entries(r.players)) {
+          if (pid === playerId || player.socketId === socket.id) {
+            log('⚠️ Room not found by code, but found by player ID:', code);
+            delete r.players[pid];
+            socket.leave(code);
+            io.to(code).emit('playerList', Object.values(r.players));
+            if (Object.keys(r.players).length === 0) {
+              delete gameState[code];
+              log('🧹 Deleted fallback-found room:', code);
+            }
+            return;
+          }
+        }
       }
+
+      log('❌ leaveRoom failed: No matching room for player');
+      return;
+    }
+
+    if (!room.players[playerId]) {
+      log('❌ leaveRoom failed: Player not found in room');
+      return;
+    }
+
+    delete room.players[playerId];
+    socket.leave(roomCode);
+    io.to(roomCode).emit('playerList', Object.values(room.players));
+    log('✅ Player removed:', playerId);
+
+    if (Object.keys(room.players).length === 0) {
+      delete gameState[roomCode];
+      log('🧹 Room deleted because it became empty:', roomCode);
     }
   });
 
-  socket.on("disconnect", () => {
+  socket.on('disconnect', () => {
+    log(`❌ Socket disconnected: ${socket.id}`);
     for (const [roomCode, room] of Object.entries(gameState)) {
       for (const [playerId, player] of Object.entries(room.players)) {
         if (player.socketId === socket.id) {
           delete room.players[playerId];
-          io.to(roomCode).emit("playerList", Object.values(room.players));
+          io.to(roomCode).emit('playerList', Object.values(room.players));
           if (Object.keys(room.players).length === 0) {
             delete gameState[roomCode];
           }
@@ -247,18 +284,18 @@ function revealAndAdvance(roomCode) {
     player.answer = null;
   }
 
-  io.to(roomCode).emit("revealAnswer", { correct, scores });
+  io.to(roomCode).emit('revealAnswer', { correct, scores });
 
   setTimeout(() => {
     room.currentIndex++;
     if (room.currentIndex < room.questions.length) {
       io.to(roomCode).emit(
-        "question",
+        'question',
         formatQuestion(room.questions[room.currentIndex])
       );
       startQuestionTimer(roomCode);
     } else {
-      io.to(roomCode).emit("quizOver", {
+      io.to(roomCode).emit('quizOver', {
         scores,
         questions: room.questions,
         answerLog: room.answerLog,
@@ -279,13 +316,13 @@ function formatQuestion(q) {
 }
 
 function generateRoomCode() {
-  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
   let code;
   do {
     code = Array.from(
       { length: 4 },
       () => chars[Math.floor(Math.random() * chars.length)]
-    ).join("");
+    ).join('');
   } while (gameState[code]);
   return code;
 }
@@ -296,5 +333,5 @@ function logGameState() {
 }
 
 server.listen(PORT, () => {
-  //console.log(`Server running at http://localhost:${PORT}`);
+  console.log(`Server running at http://localhost:${PORT}`);
 });
