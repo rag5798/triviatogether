@@ -273,7 +273,7 @@ window.addEventListener("load", () => {
 function hostRoom() {
   const name = document.getElementById("hostName").value;
   const selectedCategory = document.getElementById("categorySelect").value;
-  console.log(selectedCategory);
+  //console.log(selectedCategory);
   if (!name) return alert("Enter a name to host");
 
   socket.emit(

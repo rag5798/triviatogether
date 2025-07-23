@@ -20,7 +20,7 @@ app.get("/", (req, res) => {
 const gameState = {};
 
 io.on("connection", (socket) => {
-  console.log("Socket connected:", socket.id);
+  ////console.log("Socket connected:", socket.id);
 
   socket.on("hostRoom", ({ hostName, category }, callback) => {
     const roomCode = generateRoomCode();
@@ -189,7 +189,7 @@ io.on("connection", (socket) => {
 
       if (Object.keys(room.players).length === 0) {
         delete gameState[roomCode];
-        console.log(`Room ${roomCode} deleted`);
+        //console.log(`Room ${roomCode} deleted`);
       }
     }
   });
@@ -228,7 +228,7 @@ function startQuestionTimer(roomCode) {
   if (!room) return;
 
   room.timer = setTimeout(() => {
-    console.log("Timer expired");
+    //console.log("Timer expired");
     revealAndAdvance(roomCode);
   }, 15000);
 }
@@ -291,10 +291,10 @@ function generateRoomCode() {
 }
 
 function logGameState() {
-  console.log("Current Game State:");
+  //console.log("Current Game State:");
   console.dir(gameState, { depth: null });
 }
 
 server.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`);
+  //console.log(`Server running at http://localhost:${PORT}`);
 });
